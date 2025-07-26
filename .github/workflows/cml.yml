@@ -1,0 +1,48 @@
+name: Train and Deploy Iris Model with CML
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  deploy-iris:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install joblib cml scikit-learn pandas pytest
+
+    - name: Train Model
+      run: python src/train.py
+
+    - name: Run Tests
+      run: |
+        pytest src/test_model.py | tee test_output.txt
+
+    - name: Post CML Report
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "## Test Results" > report.md
+        echo '```' >> report.md
+        cat test_output.txt >> report.md
+        echo '```' >> report.md
+        echo "##  Metrics" >> report.md
+        cat metrics.csv >> report.md
+        npx cml comment create report.md
