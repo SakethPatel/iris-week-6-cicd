@@ -41,10 +41,12 @@ jobs:
 
     - name: Authenticate Docker with Artifact Registry
       run: |
-        echo "${{ secrets.GCLOUD_KEY }}" > gcloud-key.json
+        echo "$GCLOUD_KEY" > gcloud-key.json
         gcloud auth activate-service-account --key-file=gcloud-key.json
         gcloud config set project wise-ally-461615-t2
         gcloud auth configure-docker us-central1-docker.pkg.dev
+      env:
+        GCLOUD_KEY: ${{ secrets.GCLOUD_KEY }}
 
     - name: Build and Push Docker Image
       run: |
