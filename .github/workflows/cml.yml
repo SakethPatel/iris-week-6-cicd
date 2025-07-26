@@ -30,6 +30,9 @@ jobs:
     - name: Train Model
       run: python src/train.py
 
+    - name: Evaluate Model
+      run: python src/evaluate.py
+
     - name: Run Tests
       run: |
         pytest src/test_model.py | tee test_output.txt
