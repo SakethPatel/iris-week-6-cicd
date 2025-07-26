@@ -59,7 +59,9 @@ jobs:
     - name: Configure kubeconfig
       run: |
         mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
+        echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
+      env:
+        KUBECONFIG: ${{ secrets.KUBECONFIG }}
 
     - name: Deploy to GKE
       run: kubectl apply -f k8s/deployment.yml
